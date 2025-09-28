@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform } from "framer-motion"
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CiHeart } from "react-icons/ci";
 import { FaHome, FaWpexplorer } from "react-icons/fa";
 import { LuMessageSquare } from "react-icons/lu";
@@ -13,9 +13,15 @@ interface side {
 const Exercise = () => {
     const [isVisible, setIsVisible] = useState <boolean> (false);
 
+    const audioRef = useRef <HTMLAudioElement> (null);
+
     const styleForIcon = 'tranform translate-y-[5px] mr-[10px]'
     
-    const colors = ['yellow', 'red', 'green'];
+    const colors: string[][] = [
+        ['#FFFF00', '#FF0000', '#008000'],  
+        ['#FF0000', '#008000', '#FFFF00'],  
+        ['#008000', '#FFFF00', '#FF0000']   
+    ];
 
     const sidebar: side[] = [
         { name: 'Home', avt: <FaHome className={styleForIcon} /> },
@@ -64,7 +70,7 @@ const Exercise = () => {
     // const y = useTransform(scrollY, [0, 100], [0, -620]);
 
     return (
-        <div className="flex w-[2800px]">
+        <div className="flex">
 
             <motion.div className="h-screen w-screen flex flex-col justify-center items-center"
                 variants={rootVariants}
@@ -83,7 +89,22 @@ const Exercise = () => {
                     {colors.map((c, id) => (
                         <div className="flex flex-col items-center">
                             <div key={id} className="h-[250px] w-[2px] bg-black"></div> 
-                            <PiBalloonFill className="text-[5rem] rotate-[180deg] transform translate-y-[-5px]" style={{ color: c }} />
+                            <motion.div
+                                animate={{ 
+                                    color: [c[0], c[1], c[2]], 
+                                    y: [0, -50, 0],
+                                }}
+                                transition={{
+                                    duration: 1,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: id * 0.1,
+                                }}
+                            >
+                                <PiBalloonFill 
+                                    className="text-[5rem] rotate-[180deg] transform translate-y-[-5px]"  
+                                />
+                            </motion.div>
                         </div>   
                     ))} 
 
@@ -125,7 +146,12 @@ const Exercise = () => {
 
                     className="absolute z-[9999] text-white p-[10px_20px] font-bold cursor-pointer rounded-lg border-2 border-none"
                     initial={{ scale: 1 }} 
-                    whileHover={{ scale: 1.1 }}
+                    animate={{ scale: [1, 1.1, 1], }}
+                    transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
                     whileTap={{ scale: 0.9 }} 
                     onClick={() => setIsVisible(!isVisible)}
                     drag
@@ -145,22 +171,35 @@ const Exercise = () => {
             </motion.div>
 
             {/* crush respond =)) */}
-            <motion.div className="bg-black text-[2rem] font-bold absolute left-[460px] w-screen top-[1100px]"
-                // style={{ y, scale }}
-                whileInView={{
-                    scale: 1.2,
-                    y: -400,
-                    backgroundColor: 'transparent',
-                }}
-            >
-                <div className="transform translate-x-[70px] z-[999]">Cook!</div>
-                <motion.img 
-                    width={400} src="https://inkythuatso.com/uploads/thumbnails/800/2023/01/4-anh-meo-cam-sung-meme-de-thuong-17-15-40-25.jpg" alt="" 
-                    initial={{
-                        rotateY: 180,
+            {isVisible && (
+                <motion.div className="text-[2rem] font-bold absolute left-[460px] w-screen top-[1100px]"
+                    // style={{ y, scale }}
+                    whileInView={{
+                        scale: 1.2,
+                        y: -400,
                     }}
-                />
-            </motion.div>
+                
+                    onViewportEnter={() => {
+                        if (audioRef.current) {
+                            audioRef.current.currentTime = 0;
+                            audioRef.current.play();
+                        }
+                    }}
+
+                    onViewportLeave={() => {
+                        if (audioRef.current) {
+                            audioRef.current.pause();
+                        }
+                    }}
+                >
+                    <div className="transform translate-x-[70px] z-[999]">Cook!</div>
+                    <motion.img 
+                        width={400} src="https://inkythuatso.com/uploads/thumbnails/800/2023/01/4-anh-meo-cam-sung-meme-de-thuong-17-15-40-25.jpg" alt="" 
+                        initial={{ rotateY: 180, }}
+                    />
+                    <audio ref={audioRef} src="gun-shot-359196.mp3" ></audio>
+                </motion.div>
+            )}
         </div>
     )
 }
