@@ -64,6 +64,25 @@ const Exercise = () => {
         return x == 0 ? c2.get() : c1.get();
     });
 
+    const [ID, setID] = useState <number> (0);
+
+    const flowers: string[] = [
+        'https://media.istockphoto.com/id/616241794/photo/gerbera-flower-and-hand.jpg?s=612x612&w=0&k=20&c=r0-NErmjcENTwjGkHYLYXyJypIQQvPWS2vfniqZwkhI=',
+        'https://png.pngtree.com/background/20230707/original/pngtree-womens-arm-holding-pink-lily-flower-beautiful-soft-skin-photo-picture-image_4160867.jpg',
+        'https://media.istockphoto.com/id/1249591828/photo/hands-holding-bouquet-of-red-roses-on-white-background-for-gift-gift-for-lovers-and-valentine.jpg?s=612x612&w=0&k=20&c=UfMd-BWaxS6yoglU9QVXitXDWUs___yM-seK2YNxQRk=',
+    ]
+
+    const handleSwipe = (_: any, info: any): void => {
+        if (info.offset.y <= -60) {
+            setID((ID + 1) % 3);
+        }
+        if (info.offset.y >= 60) {
+            let id = ID - 1;
+            if (id < 0) id = 2;
+            setID(id);
+        }
+    };
+
     // const { scrollY } = useScroll();
 
     // const scale = useTransform(scrollY, [0, 100], [1, 1.2]);
@@ -128,19 +147,32 @@ const Exercise = () => {
                 </motion.div>
                     
                 {/* HandFlower */}
-                <motion.div className="left-[1400px] h-screen w-[600px] flex flex-col justify-end items-center"
-                    variants={{
-                        hidden: { opacity: 0, x: 0 },
-                        visible: { opacity: 1, x: -450, position: 'fixed' },
-                    }}                    
-                >
-                    <div className="text-[2rem]">
-                        Tặng cậu!
-                        <img src="https://png.pngtree.com/background/20230707/original/pngtree-womens-arm-holding-pink-lily-flower-beautiful-soft-skin-photo-picture-image_4160867.jpg" alt="" />
-                    </div>
-                    
-                </motion.div>
-
+                
+                    <motion.div className="left-[1400px] h-screen w-[600px] flex flex-col justify-end items-center overflow-hidden"
+                        variants={{
+                            hidden: { opacity: 0, x: 0 },
+                            visible: { opacity: 1, x: -450, position: 'fixed' },
+                        }}                    
+                    >
+                        <div className="text-[2rem]">
+                            {flowers.map((flower, id) => (  
+                                <motion.img className="cursor-pointer absolute top-[250px] left-[-100px] bg-red-500" key={id} src={flower} alt="" 
+                                drag='y'
+                                dragConstraints={{
+                                    top: -60,
+                                    bottom: 60,
+                                }}
+                                onDragEnd={handleSwipe}
+                                animate={ id == ID ? { opacity: 1 } : { opacity: 0 } } 
+                                transition={{ type: 'spring', stiffness: 200 }} 
+                                /> 
+                                
+                            ))}
+                            <p className="transform translate-y-[-450px] translate-x-[-100px]">Tặng cậu! <br />{'(drag to change image)'}</p>
+                        </div>
+                        
+                    </motion.div>    
+                
                 {/* Button */}
                 <motion.button 
 
