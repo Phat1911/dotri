@@ -71,3 +71,9 @@ export default defineConfig([
   },
 ])
 ```
+
+## Beside, you need to install frammer-motion to use this code:
+
+```cmd
+npm install frammer-motion
+```
